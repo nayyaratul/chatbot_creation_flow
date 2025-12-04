@@ -1,0 +1,35 @@
+[
+  {
+    "id": "kb-1",
+    "filename": "SB_HR_Policy_v3.pdf",
+    "description": "Updated HR policies for all employees",
+    "uploadedBy": "Anuj Saxena",
+    "uploadedOn": "2025-11-12",
+    "fileType": "PDF"
+  },
+  {
+    "id": "kb-2",
+    "filename": "PMKVY_4.0_Guidelines.docx",
+    "description": "Complete scheme overview & attendance rules",
+    "uploadedBy": "Vrushali Muley",
+    "uploadedOn": "2025-10-03",
+    "fileType": "DOCX"
+  },
+  {
+    "id": "kb-3",
+    "filename": "L&D_Onboarding_FAQ.xlsx",
+    "description": "Common learner questions & answers",
+    "uploadedBy": "SkillBetter Admin",
+    "uploadedOn": "2025-09-25",
+    "fileType": "XLSX"
+  },
+  {
+    "id": "kb-4",
+    "filename": "Platform_User_Guide_v2.pdf",
+    "description": "Navigation help & feature walkthrough",
+    "uploadedBy": "Yash Sharma",
+    "uploadedOn": "2025-08-05",
+    "fileType": "PDF"
+  }
+]
+
