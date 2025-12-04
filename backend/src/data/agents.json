@@ -1,2 +1,34 @@
-[]
-
+[
+  {
+    "id": "agent-1",
+    "name": "HR Assistant Bot",
+    "description": "Helps employees with HR policies and questions",
+    "avatarUrl": null,
+    "ownerId": "user-1",
+    "owners": [],
+    "defaultLanguage": "English",
+    "status": "active",
+    "settings": {
+      "tone": "professional",
+      "firstMessage": "Hi {user_name}, I am HR Assistant Bot. How can I help you today?",
+      "temperature": 0.5,
+      "guardrails": {
+        "onlyUseKnowledgeBase": true,
+        "onlyCompanyJobQueries": true,
+        "mentionSourceDocument": true
+      },
+      "fallbackMessage": "The bot must not guess or invent information. If the answer is not clearly available in the attached knowledge base or SkillBetter system context, it must explicitly state that the information is unavailable.",
+      "tasks": "Assist employees with HR policy questions, provide information about company benefits, help with onboarding processes, and answer common HR-related queries.",
+      "agentRole": "HR Assistant"
+    },
+    "conversationConfig": {
+      "maxLength": 150,
+      "silenceTimeout": 30,
+      "maxDuration": null,
+      "chatMode": "text-to-text"
+    },
+    "knowledgeBaseFileIds": ["kb-1", "kb-3"],
+    "createdAt": "2025-01-15T10:00:00.000Z",
+    "updatedAt": "2025-01-15T10:00:00.000Z"
+  }
+]

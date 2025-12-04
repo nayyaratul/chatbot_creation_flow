@@ -1,6 +1,7 @@
 import { Table, Tag, Dropdown, Button, Space } from 'antd';
-import type { ColumnsType } from 'antd/es/table';
+import type { ColumnsType, FilterValue } from 'antd/es/table/interface';
 import { EyeOutlined, EditOutlined, MoreOutlined } from '@ant-design/icons';
+import { useState } from 'react';
 import { Agent } from '../../types/agent';
 
 interface AgentTableProps {
@@ -12,11 +13,18 @@ interface AgentTableProps {
 }
 
 function AgentTable({ agents, loading, onPreview, onEdit, onDelete }: AgentTableProps) {
+  const [filteredInfo, setFilteredInfo] = useState<Record<string, FilterValue | null>>({});
+
+  const handleFilterChange = (filters: Record<string, FilterValue | null>) => {
+    setFilteredInfo(filters);
+  };
+
   const columns: ColumnsType<Agent> = [
     {
       title: 'Agent Name',
       dataIndex: 'name',
       key: 'name',
+      width: 220,
       sorter: (a, b) => a.name.localeCompare(b.name),
       render: (text, record) => (
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
@@ -27,47 +35,94 @@ function AgentTable({ agents, loading, onPreview, onEdit, onDelete }: AgentTable
               style={{ width: '32px', height: '32px', borderRadius: '50%', objectFit: 'cover' }}
             />
           )}
-          <span style={{ fontWeight: 500 }}>{text}</span>
+          <span style={{ fontWeight: 500, fontSize: '14px', lineHeight: '22px', color: '#000000' }}>
+            {text}
+          </span>
         </div>
+      ),
+    },
+    {
+      title: 'Status',
+      dataIndex: 'status',
+      key: 'status',
+      width: 150,
+      filters: [
+        { text: 'Active', value: 'active' },
+        { text: 'Inactive', value: 'inactive' },
+        { text: 'Draft', value: 'draft' },
+      ],
+      filteredValue: filteredInfo.status || null,
+      onFilter: (value, record) => record.status === value,
+      render: (status) => (
+        <Space>
+          <Tag
+            color={status === 'active' ? 'success' : status === 'draft' ? 'warning' : 'default'}
+            style={{
+              fontSize: '12px',
+              lineHeight: '20px',
+              padding: '0 8px',
+              borderRadius: '4px',
+              margin: 0,
+            }}
+          >
+            {status === 'active' ? 'Active' : status === 'draft' ? 'Draft' : 'Inactive'}
+          </Tag>
+        </Space>
       ),
     },
     {
       title: 'Owner',
       dataIndex: 'ownerId',
       key: 'owner',
-      render: (ownerId) => <span>{ownerId}</span>, // In real app, would fetch user name
+      width: 190,
+      render: (ownerId) => (
+        <span style={{ fontSize: '14px', lineHeight: '22px', color: '#000000' }}>
+          {ownerId}
+        </span>
+      ),
     },
     {
       title: 'Default Language',
       dataIndex: 'defaultLanguage',
       key: 'defaultLanguage',
+      width: 112,
+      render: (lang) => (
+        <span style={{ fontSize: '14px', lineHeight: '22px', color: '#000000' }}>{lang}</span>
+      ),
     },
     {
       title: 'Knowledge Bases',
       key: 'knowledgeBases',
+      width: 104,
       render: (_, record) => (
-        <span>{record.knowledgeBaseFileIds.length} file(s)</span>
+        <span style={{ fontSize: '14px', lineHeight: '22px', color: '#000000' }}>
+          {record.knowledgeBaseFileIds.length} file(s)
+        </span>
       ),
     },
     {
       title: 'Conversations',
       key: 'conversations',
-      render: () => <span>0</span>, // Placeholder - would come from analytics
+      width: 100,
+      render: () => (
+        <span style={{ fontSize: '14px', lineHeight: '22px', color: '#000000' }}>0</span>
+      ),
     },
     {
-      title: 'Status',
-      dataIndex: 'status',
-      key: 'status',
-      render: (status) => (
-        <Tag color={status === 'active' ? 'success' : 'default'}>
-          {status === 'active' ? 'Active' : 'Inactive'}
-        </Tag>
+      title: 'Last Updated',
+      dataIndex: 'updatedAt',
+      key: 'updatedAt',
+      width: 100,
+      render: (date) => (
+        <span style={{ fontSize: '14px', lineHeight: '22px', color: '#000000' }}>
+          {new Date(date).toLocaleDateString()}
+        </span>
       ),
     },
     {
       title: 'Actions',
       key: 'actions',
-      width: 120,
+      width: 118,
       render: (_, record) => (
         <Space>
           <Button
@@ -75,6 +130,7 @@ function AgentTable({ agents, loading, onPreview, onEdit, onDelete }: AgentTable
             icon={<EyeOutlined />}
             onClick={() => onPreview(record)}
             title="Preview"
+            style={{ padding: '4px 8px' }}
           />
           <Dropdown
             menu={{
@@ -95,7 +151,7 @@ function AgentTable({ agents, loading, onPreview, onEdit, onDelete }: AgentTable
             }}
             trigger={['click']}
           >
-            <Button type="text" icon={<MoreOutlined />} />
+            <Button type="text" icon={<MoreOutlined />} style={{ padding: '4px 8px' }} />
           </Dropdown>
         </Space>
       ),
@@ -103,18 +159,66 @@ function AgentTable({ agents, loading, onPreview, onEdit, onDelete }: AgentTable
   ];
 
   return (
-    <Table
-      columns={columns}
-      dataSource={agents}
-      loading={loading}
-      rowKey="id"
-      pagination={{
-        pageSize: 10,
-        showSizeChanger: true,
-        showTotal: (total) => `Total ${total} agents`,
+    <div
+      style={{
+        background: '#FFFFFF',
+        borderRadius: '8px',
+        border: '1px solid rgba(0, 0, 0, 0.06)',
+        overflow: 'hidden',
       }}
-      style={{ background: '#FFFFFF' }}
-    />
+    >
+      <Table
+        columns={columns}
+        dataSource={agents}
+        loading={loading}
+        rowKey="id"
+        onChange={(_, filters) => handleFilterChange(filters as Record<string, FilterValue | null>)}
+        pagination={{
+          pageSize: 10,
+          showSizeChanger: true,
+          showTotal: (total) => `Total ${total} agents`,
+          style: { padding: '16px 24px' },
+        }}
+        rowSelection={{
+          type: 'checkbox',
+          columnWidth: 32,
+        }}
+        style={{
+          background: '#FFFFFF',
+        }}
+        components={{
+          header: {
+            cell: (props: any) => (
+              <th
+                {...props}
+                style={{
+                  ...props.style,
+                  background: '#FAFAFA',
+                  borderBottom: '1px solid rgba(0, 0, 0, 0.06)',
+                  padding: '8px 16px',
+                  fontSize: '14px',
+                  fontWeight: 600,
+                  lineHeight: '22px',
+                  color: '#000000',
+                }}
+              />
+            ),
+          },
+          body: {
+            cell: (props: any) => (
+              <td
+                {...props}
+                style={{
+                  ...props.style,
+                  padding: '8px 16px',
+                  borderBottom: '1px solid rgba(0, 0, 0, 0.06)',
+                }}
+              />
+            ),
+          },
+        }}
+      />
+    </div>
   );
 }
 

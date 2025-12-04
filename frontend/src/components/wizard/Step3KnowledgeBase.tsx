@@ -146,26 +146,29 @@ function Step3KnowledgeBase({ formData, updateFormData, onNext, onPrev }: Step3K
         Step 3 · Knowledge Base Selection
       </h2>
       
-      <div style={{ display: 'flex', gap: '24px' }}>
-        {/* Left: KB List */}
-        <div style={{ flex: '0 0 60%' }}>
-          <Space direction="vertical" size="middle" style={{ width: '100%' }}>
-            <Search
-              placeholder="Search by file name or description"
-              value={searchText}
-              onChange={(e) => {
-                setSearchText(e.target.value);
-              }}
-              onSearch={filterFiles}
-              allowClear
-            />
+      <Space direction="vertical" size="large" style={{ width: '100%' }}>
+        {/* Search */}
+        <Search
+          placeholder="Search by file name or description"
+          value={searchText}
+          onChange={(e) => {
+            setSearchText(e.target.value);
+          }}
+          onSearch={filterFiles}
+          allowClear
+          style={{ width: '100%' }}
+        />
 
+        {/* Main Content: Table and Selected Files Side by Side */}
+        <div style={{ display: 'flex', gap: '16px', alignItems: 'flex-start' }}>
+          {/* Left: KB Table */}
+          <div style={{ flex: '1 1 0', minWidth: 0 }}>
             <Table
               columns={columns}
               dataSource={filteredFiles}
               rowKey="id"
               loading={loading}
-              pagination={{ pageSize: 10 }}
+              pagination={{ pageSize: 5, showSizeChanger: false }}
               onRow={(record) => ({
                 onClick: () => handleRowClick(record),
                 style: { cursor: 'pointer' },
@@ -173,80 +176,94 @@ function Step3KnowledgeBase({ formData, updateFormData, onNext, onPrev }: Step3K
               locale={{
                 emptyText: <Empty description="No knowledge bases found" />,
               }}
+              scroll={{ x: 'max-content' }}
             />
-          </Space>
-        </div>
+          </div>
 
-        {/* Right: Selected Files */}
-        <div style={{ flex: '0 0 40%' }}>
-          <Card
-            title={`Selected Files (${selectedFiles.length})`}
-            extra={
-              selectedFiles.length > 0 && (
-                <Button type="link" danger size="small" onClick={handleRemoveAll}>
-                  Remove all
-                </Button>
-              )
-            }
-          >
-            <Space direction="vertical" size="middle" style={{ width: '100%' }}>
-              {selectedFiles.length === 0 ? (
-                <Text type="secondary">No files selected</Text>
-              ) : (
-                <Space direction="vertical" size="small" style={{ width: '100%' }}>
-                  {selectedFileObjects.map(file => (
-                    <Tag
-                      key={file.id}
-                      closable
-                      onClose={() => handleRemoveFile(file.id)}
-                      style={{ marginBottom: '8px', padding: '4px 8px' }}
-                    >
-                      {file.filename}
-                    </Tag>
-                  ))}
-                </Space>
-              )}
-
-              {selectedFileDetail && (
-                <div style={{ marginTop: '16px', padding: '12px', background: '#F5F5F5', borderRadius: '6px' }}>
-                  <Text strong style={{ display: 'block', marginBottom: '8px' }}>
-                    File Details
+          {/* Right: Selected Files Card */}
+          <div style={{ flex: '0 0 280px', minWidth: 280 }}>
+            <Card
+              title={`Selected Files (${selectedFiles.length})`}
+              extra={
+                selectedFiles.length > 0 && (
+                  <Button type="link" danger size="small" onClick={handleRemoveAll}>
+                    Remove all
+                  </Button>
+                )
+              }
+              style={{ position: 'sticky', top: '16px' }}
+            >
+              <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+                {selectedFiles.length === 0 ? (
+                  <Text type="secondary" style={{ fontSize: '13px' }}>
+                    No files selected
                   </Text>
-                  <Paragraph style={{ marginBottom: '4px', fontSize: '13px' }}>
-                    <Text type="secondary">Name: </Text>
-                    <Text>{selectedFileDetail.filename}</Text>
-                  </Paragraph>
-                  <Paragraph style={{ marginBottom: '4px', fontSize: '13px' }}>
-                    <Text type="secondary">Description: </Text>
-                    <Text>{selectedFileDetail.description}</Text>
-                  </Paragraph>
-                  <Paragraph style={{ marginBottom: '4px', fontSize: '13px' }}>
-                    <Text type="secondary">Type: </Text>
-                    <Tag size="small">{selectedFileDetail.fileType}</Tag>
-                  </Paragraph>
-                  <Paragraph style={{ marginBottom: '4px', fontSize: '13px' }}>
-                    <Text type="secondary">Uploaded: </Text>
-                    <Text>{selectedFileDetail.uploadedOn}</Text>
-                  </Paragraph>
-                  <Paragraph style={{ marginBottom: 0, fontSize: '13px' }}>
-                    <Text type="secondary">By: </Text>
-                    <Text>{selectedFileDetail.uploadedBy}</Text>
-                  </Paragraph>
-                </div>
-              )}
-            </Space>
-          </Card>
-        </div>
-      </div>
+                ) : (
+                  <Space direction="vertical" size="small" style={{ width: '100%' }}>
+                    {selectedFileObjects.map(file => (
+                      <Tag
+                        key={file.id}
+                        closable
+                        onClose={() => handleRemoveFile(file.id)}
+                        style={{ 
+                          marginBottom: '4px', 
+                          padding: '4px 8px',
+                          width: '100%',
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          alignItems: 'center'
+                        }}
+                      >
+                        <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1 }}>
+                          {file.filename}
+                        </span>
+                      </Tag>
+                    ))}
+                  </Space>
+                )}
 
-      <div style={{ marginTop: '24px', display: 'flex', justifyContent: 'space-between' }}>
-        <Button onClick={onPrev} icon={<ArrowLeftOutlined />}>
-          Back
-        </Button>
-        <Button type="primary" onClick={handleNext} icon={<ArrowRightOutlined />}>
-          Next: Summary
-        </Button>
-      </div>
+                {selectedFileDetail && (
+                  <div style={{ marginTop: '16px', padding: '12px', background: '#F5F5F5', borderRadius: '6px' }}>
+                    <Text strong style={{ display: 'block', marginBottom: '8px', fontSize: '13px' }}>
+                      File Details
+                    </Text>
+                    <Paragraph style={{ marginBottom: '4px', fontSize: '12px' }}>
+                      <Text type="secondary">Name: </Text>
+                      <Text style={{ fontSize: '12px' }}>{selectedFileDetail.filename}</Text>
+                    </Paragraph>
+                    <Paragraph style={{ marginBottom: '4px', fontSize: '12px' }}>
+                      <Text type="secondary">Description: </Text>
+                      <Text style={{ fontSize: '12px' }}>{selectedFileDetail.description}</Text>
+                    </Paragraph>
+                    <Paragraph style={{ marginBottom: '4px', fontSize: '12px' }}>
+                      <Text type="secondary">Type: </Text>
+                      <Tag size="small">{selectedFileDetail.fileType}</Tag>
+                    </Paragraph>
+                    <Paragraph style={{ marginBottom: '4px', fontSize: '12px' }}>
+                      <Text type="secondary">Uploaded: </Text>
+                      <Text style={{ fontSize: '12px' }}>{selectedFileDetail.uploadedOn}</Text>
+                    </Paragraph>
+                    <Paragraph style={{ marginBottom: 0, fontSize: '12px' }}>
+                      <Text type="secondary">By: </Text>
+                      <Text style={{ fontSize: '12px' }}>{selectedFileDetail.uploadedBy}</Text>
+                    </Paragraph>
+                  </div>
+                )}
+              </Space>
+            </Card>
+          </div>
+        </div>
+
+        {/* Navigation Buttons */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '16px' }}>
+          <Button onClick={onPrev} icon={<ArrowLeftOutlined />}>
+            Back
+          </Button>
+          <Button type="primary" onClick={handleNext} icon={<ArrowRightOutlined />}>
+            Next: Summary
+          </Button>
+        </div>
+      </Space>
     </div>
   );
 }

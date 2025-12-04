@@ -1,7 +1,8 @@
 import fs from 'fs';
 import path from 'path';
 
-const DATA_DIR = path.join(__dirname, '../data');
+// Use absolute path resolution to ensure we're reading from the correct location
+const DATA_DIR = path.resolve(__dirname, '../data');
 
 // Ensure data directory exists
 if (!fs.existsSync(DATA_DIR)) {

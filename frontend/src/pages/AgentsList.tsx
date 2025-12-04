@@ -1,39 +1,60 @@
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Layout, Button, PageHeader } from 'antd';
+import { useState, useEffect, useCallback } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { Layout, Button, Tabs } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { agentApi } from '../services/api';
 import { Agent } from '../types/agent';
 import AgentTable from '../components/agents/AgentTable';
 import PreviewDrawer from '../components/agents/PreviewDrawer';
 import CreateAgentCard from '../components/agents/CreateAgentCard';
+import Sidebar from '../components/shared/Sidebar';
+import PageHeader from '../components/shared/PageHeader';
+import PageTitleBar from '../components/shared/PageTitleBar';
+import StatsCards from '../components/shared/StatsCards';
 import { message } from 'antd';
 
-const { Header, Content } = Layout;
+const { Content } = Layout;
 
 function AgentsList() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [agents, setAgents] = useState<Agent[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [previewAgent, setPreviewAgent] = useState<Agent | null>(null);
   const [drawerVisible, setDrawerVisible] = useState(false);
+  const [activeTab, setActiveTab] = useState('ai-agent');
 
-  useEffect(() => {
-    loadAgents();
-  }, []);
-
-  const loadAgents = async () => {
+  const loadAgents = useCallback(async () => {
     try {
       setLoading(true);
       const data = await agentApi.getAll();
-      setAgents(data);
-    } catch (error) {
+      setAgents(Array.isArray(data) ? data : []); // Ensure we always have an array
+    } catch (error: any) {
       message.error('Failed to load agents');
-      console.error(error);
+      console.error('Error loading agents:', error);
+      setAgents([]); // Set empty array on error to prevent stuck loading state
     } finally {
+      // Always set loading to false, even if there's an error
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    // Load agents when component mounts or when on the /agents route
+    if (location.pathname === '/agents') {
+      loadAgents();
+    } else {
+      // Reset loading state if not on agents route
+      setLoading(false);
+    }
+  }, [location.pathname, loadAgents]);
+
+  useEffect(() => {
+    // Load agents when AI Agent tab is selected
+    if (activeTab === 'ai-agent' && location.pathname === '/agents') {
+      loadAgents();
+    }
+  }, [activeTab, location.pathname, loadAgents]);
 
   const handleCreateAgent = () => {
     navigate('/agents/new');
@@ -58,39 +79,131 @@ function AgentsList() {
     }
   };
 
+  const activeCount = agents.filter((a) => a.status === 'active').length;
+
   return (
     <Layout style={{ minHeight: '100vh', background: '#F5F5F5' }}>
-      <Header style={{ background: '#FFFFFF', padding: '0 24px', borderBottom: '1px solid #D9D9D9' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', height: '100%' }}>
-          <h1 style={{ margin: 0, fontSize: '28px', fontWeight: 600, color: '#1F1F1F' }}>AI Agents</h1>
-          <Button
-            type="primary"
-            icon={<PlusOutlined />}
-            onClick={handleCreateAgent}
-            size="large"
-          >
-            Create Agent
-          </Button>
-        </div>
-      </Header>
-      <Content style={{ padding: '24px' }}>
-        {agents.length === 0 && !loading ? (
-          <CreateAgentCard onCreateAgent={handleCreateAgent} />
-        ) : (
-          <>
-            {agents.length === 0 ? null : (
-              <CreateAgentCard onCreateAgent={handleCreateAgent} inline />
-            )}
-            <AgentTable
-              agents={agents}
-              loading={loading}
-              onPreview={handlePreview}
-              onEdit={handleEdit}
-              onDelete={handleDelete}
+      <Sidebar />
+      <Layout style={{ marginLeft: 0 }}>
+        <PageHeader />
+        <PageTitleBar />
+        <Content
+          style={{
+            padding: '24px',
+            paddingTop: '8px',
+            background: '#F5F5F5',
+            minHeight: 'calc(100vh - 132px)',
+          }}
+        >
+          <div style={{ maxWidth: '1128px', margin: '0 auto' }}>
+            <Tabs
+              activeKey={activeTab}
+              onChange={setActiveTab}
+              items={[
+                {
+                  key: 'overview',
+                  label: 'Overview',
+                },
+                {
+                  key: 'knowledge-base',
+                  label: 'Knowledge Base',
+                },
+                {
+                  key: 'ai-agent',
+                  label: 'AI Agent',
+                },
+                {
+                  key: 'credits',
+                  label: 'Credits',
+                },
+              ]}
+              style={{ marginBottom: '0', marginTop: '0' }}
             />
-          </>
-        )}
-      </Content>
+            {activeTab === 'ai-agent' && (
+              <>
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'flex-start',
+                    marginBottom: '24px',
+                    marginTop: '16px',
+                  }}
+                >
+                  <div>
+                    <h2
+                      style={{
+                        margin: 0,
+                        fontSize: '20px',
+                        fontWeight: 600,
+                        lineHeight: '28px',
+                        color: '#000000',
+                        marginBottom: '4px',
+                      }}
+                    >
+                      AI Agents
+                    </h2>
+                    <p
+                      style={{
+                        margin: 0,
+                        fontSize: '12px',
+                        fontWeight: 400,
+                        lineHeight: '20px',
+                        color: '#8C8C8C',
+                      }}
+                    >
+                      Manage and monitor your AI Agents
+                    </p>
+                  </div>
+                  <Button
+                    type="primary"
+                    icon={<PlusOutlined />}
+                    onClick={handleCreateAgent}
+                    style={{
+                      height: '32px',
+                      borderRadius: '8px',
+                      fontSize: '14px',
+                      fontWeight: 400,
+                      lineHeight: '22px',
+                      padding: '0 15px',
+                      boxShadow: '0px 2px 0px 0px rgba(5, 145, 255, 0.1)',
+                    }}
+                  >
+                    Create Chatbot
+                  </Button>
+                </div>
+                {!loading && agents.length > 0 && <StatsCards activeCount={activeCount} />}
+                {agents.length === 0 && !loading ? (
+                  <CreateAgentCard onCreateAgent={handleCreateAgent} />
+                ) : (
+                  <AgentTable
+                    agents={agents}
+                    loading={loading}
+                    onPreview={handlePreview}
+                    onEdit={handleEdit}
+                    onDelete={handleDelete}
+                  />
+                )}
+              </>
+            )}
+            {activeTab === 'overview' && (
+              <div style={{ padding: '24px', textAlign: 'center', color: '#8C8C8C' }}>
+                Overview content coming soon
+              </div>
+            )}
+            {activeTab === 'knowledge-base' && (
+              <div style={{ padding: '24px', textAlign: 'center', color: '#8C8C8C' }}>
+                Knowledge Base content coming soon
+              </div>
+            )}
+            {activeTab === 'credits' && (
+              <div style={{ padding: '24px', textAlign: 'center', color: '#8C8C8C' }}>
+                Credits content coming soon
+              </div>
+            )}
+          </div>
+        </Content>
+      </Layout>
       <PreviewDrawer
         agent={previewAgent}
         visible={drawerVisible}

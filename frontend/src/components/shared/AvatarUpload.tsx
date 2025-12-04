@@ -1,7 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Upload, Avatar, message } from 'antd';
 import { UserOutlined, UploadOutlined } from '@ant-design/icons';
-import type { UploadFile } from 'antd/es/upload/interface';
 
 interface AvatarUploadProps {
   value?: string;
@@ -11,20 +10,24 @@ interface AvatarUploadProps {
 function AvatarUpload({ value, onChange }: AvatarUploadProps) {
   const [imageUrl, setImageUrl] = useState<string | undefined>(value);
 
-  const handleChange = (info: any) => {
-    if (info.file.status === 'done') {
-      // In a real app, this would upload to a server and return a URL
-      // For now, we'll use a data URL
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const url = e.target?.result as string;
-        setImageUrl(url);
-        onChange?.(url);
-      };
-      reader.readAsDataURL(info.file.originFileObj);
-    } else if (info.file.status === 'error') {
-      message.error('Upload failed');
-    }
+  // Update local state when value prop changes
+  useEffect(() => {
+    setImageUrl(value);
+  }, [value]);
+
+  const handleFile = (file: File) => {
+    // In a real app, this would upload to a server and return a URL
+    // For now, we'll use a data URL
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const url = e.target?.result as string;
+      setImageUrl(url);
+      onChange?.(url);
+    };
+    reader.onerror = () => {
+      message.error('Failed to read image file');
+    };
+    reader.readAsDataURL(file);
   };
 
   const beforeUpload = (file: File) => {
@@ -38,7 +41,9 @@ function AvatarUpload({ value, onChange }: AvatarUploadProps) {
       message.error('Image must be smaller than 2MB!');
       return false;
     }
-    return true;
+    // Return false to prevent default upload, handle file manually
+    handleFile(file);
+    return false;
   };
 
   return (
@@ -53,7 +58,6 @@ function AvatarUpload({ value, onChange }: AvatarUploadProps) {
         name="avatar"
         showUploadList={false}
         beforeUpload={beforeUpload}
-        onChange={handleChange}
         accept="image/*"
       >
         <button type="button" style={{ border: 'none', background: 'transparent', cursor: 'pointer' }}>

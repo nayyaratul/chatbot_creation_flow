@@ -20,7 +20,7 @@ export function generatePreviewResponse(request: PreviewRequest): PreviewRespons
     if (tone === 'soft') {
       response = `I'd be happy to help with that! Let me check the information available to me. Based on what I know, ${userMessage.toLowerCase().includes('attendance') ? 'attendance policies are outlined in the PMKVY 4.0 guidelines document.' : 'this information should be available in the knowledge base. Let me provide you with the relevant details.'}`;
     } else {
-      response = `I can assist with that. According to the available documentation, ${userMessage.toLowerCase().includes('hr') ? 'HR policies are detailed in the SB_HR_Policy_v3.pdf document.' : 'the information you're seeking is covered in the attached knowledge base files.'}`;
+      response = `I can assist with that. According to the available documentation, ${userMessage.toLowerCase().includes('hr') ? 'HR policies are detailed in the SB_HR_Policy_v3.pdf document.' : 'the information you are seeking is covered in the attached knowledge base files.'}`;
     }
   } else {
     // Creative - more conversational

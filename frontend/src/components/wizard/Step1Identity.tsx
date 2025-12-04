@@ -25,7 +25,7 @@ function Step1Identity({ formData, updateFormData, onNext }: Step1IdentityProps)
       settings: {
         ...formData.settings,
         tasks: values.tasks || '',
-        agentRole: values.agentRole || '',
+        // agentRole is handled in Step2Behavior, not here
       },
     });
     onNext();
@@ -46,7 +46,7 @@ function Step1Identity({ formData, updateFormData, onNext }: Step1IdentityProps)
           owners: formData.owners,
           defaultLanguage: formData.defaultLanguage,
           tasks: formData.settings.tasks,
-          agentRole: formData.settings.agentRole,
+          // agentRole is handled in Step2Behavior, not here
         }}
         onFinish={handleFinish}
       >

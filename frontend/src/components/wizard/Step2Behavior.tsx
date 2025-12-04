@@ -195,12 +195,18 @@ function Step2Behavior({ formData, updateFormData, onNext, onPrev }: Step2Behavi
             name="silenceTimeout"
             rules={[
               { required: true, message: 'Silence timeout is required' },
-              { type: 'number', min: 5, message: 'Minimum 5 seconds' },
+              { 
+                validator: (_, value) => {
+                  if (value === 0) return Promise.resolve();
+                  if (value >= 5) return Promise.resolve();
+                  return Promise.reject(new Error('Must be at least 5 seconds or 0 (no auto-end)'));
+                }
+              },
             ]}
             tooltip="Auto-end conversation after X seconds of inactivity (0 = no auto-end)"
           >
             <InputNumber
-              min={5}
+              min={0}
               placeholder="15"
               addonAfter="seconds"
               style={{ width: '100%' }}
