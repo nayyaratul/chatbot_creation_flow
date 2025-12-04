@@ -53,11 +53,6 @@ export interface KnowledgeBaseFile {
   url?: string;
 }
 
-export interface AgentKBMapping {
-  agentId: string;
-  fileIds: string[];
-}
-
 export interface PreviewRequest {
   agentConfig: Partial<Agent>;
   userMessage: string;

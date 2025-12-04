@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Card, Collapse, Typography, Space, Button, Input, Tag, Avatar, Divider, message } from 'antd';
-import { ArrowLeftOutlined, EditOutlined, SendOutlined } from '@ant-design/icons';
+import { Card, Collapse, Typography, Space, Button, Input, Tag, Avatar, message } from 'antd';
+import { EditOutlined, SendOutlined } from '@ant-design/icons';
 import { AgentFormData, KnowledgeBaseFile } from '../../types/agent';
 import { previewApi, knowledgeBaseApi } from '../../services/api';
 import { composeSystemPrompt } from '../../utils/promptComposer';
@@ -12,11 +12,10 @@ const { TextArea } = Input;
 interface Step4SummaryProps {
   formData: AgentFormData;
   onSave: (data: AgentFormData, status: 'active' | 'inactive') => void;
-  onPrev: () => void;
   onEditStep: (step: number) => void;
 }
 
-function Step4Summary({ formData, onSave, onPrev, onEditStep }: Step4SummaryProps) {
+function Step4Summary({ formData, onSave, onEditStep }: Step4SummaryProps) {
   const [kbFiles, setKbFiles] = useState<KnowledgeBaseFile[]>([]);
   const [messages, setMessages] = useState<Array<{ role: 'user' | 'agent'; content: string }>>([]);
   const [inputValue, setInputValue] = useState('');
@@ -375,19 +374,6 @@ function Step4Summary({ formData, onSave, onPrev, onEditStep }: Step4SummaryProp
             </Button>
           </Space.Compact>
         </Card>
-
-        {/* Actions */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '24px' }}>
-          <Button onClick={onPrev} icon={<ArrowLeftOutlined />}>
-            Back
-          </Button>
-          <Space>
-            <Button onClick={handleSaveDraft}>Save as Draft</Button>
-            <Button type="primary" onClick={handleCreateAgent}>
-              Create Agent
-            </Button>
-          </Space>
-        </div>
       </Space>
     </div>
   );

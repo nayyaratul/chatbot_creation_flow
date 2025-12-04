@@ -1,5 +1,5 @@
-import { Form, Input, Radio, Space, Button, Typography, Divider, InputNumber, Switch, TimePicker } from 'antd';
-import { ArrowLeftOutlined, ArrowRightOutlined } from '@ant-design/icons';
+import { forwardRef, useImperativeHandle } from 'react';
+import { Form, Input, Radio, Typography, Divider, InputNumber, Switch, TimePicker } from 'antd';
 import dayjs from 'dayjs';
 import { AgentFormData } from '../../types/agent';
 import TemperatureSlider from '../shared/TemperatureSlider';
@@ -12,11 +12,21 @@ interface Step2BehaviorProps {
   formData: AgentFormData;
   updateFormData: (updates: Partial<AgentFormData>) => void;
   onNext: () => void;
-  onPrev: () => void;
 }
 
-function Step2Behavior({ formData, updateFormData, onNext, onPrev }: Step2BehaviorProps) {
-  const [form] = Form.useForm();
+export interface Step2BehaviorRef {
+  submit: () => void;
+}
+
+const Step2Behavior = forwardRef<Step2BehaviorRef, Step2BehaviorProps>(
+  ({ formData, updateFormData, onNext }, ref) => {
+    const [form] = Form.useForm();
+
+    useImperativeHandle(ref, () => ({
+      submit: () => {
+        form.submit();
+      },
+    }));
 
   const handleFinish = (values: any) => {
     updateFormData({
@@ -256,23 +266,12 @@ function Step2Behavior({ formData, updateFormData, onNext, onPrev }: Step2Behavi
             />
           </Form.Item>
         </div>
-
-        <Divider />
-
-        <Form.Item>
-          <Space>
-            <Button onClick={onPrev} icon={<ArrowLeftOutlined />}>
-              Back
-            </Button>
-            <Button type="primary" htmlType="submit" icon={<ArrowRightOutlined />}>
-              Next: Knowledge Base
-            </Button>
-          </Space>
-        </Form.Item>
       </Form>
     </div>
   );
-}
+});
+
+Step2Behavior.displayName = 'Step2Behavior';
 
 export default Step2Behavior;
 

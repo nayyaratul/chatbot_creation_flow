@@ -16,6 +16,15 @@ body {
   min-height: 100vh;
 }
 
+/* Remove bottom margin from Ant Design Cards */
+.ant-card,
+.ant-card.ant-card-bordered,
+div.ant-card,
+div.ant-card.ant-card-bordered,
+div.ant-card.ant-card-bordered[class*="css-dev-only-do-not-override"] {
+  margin-bottom: 0 !important;
+}
+
 /* Responsive Styles */
 @media (max-width: 1200px) {
   .responsive-content {
@@ -177,6 +186,27 @@ body {
   .responsive-drawer.ant-drawer {
     width: 100% !important;
     max-width: 100% !important;
+  }
+}
+
+/* Wizard bottom navigation bar - adjust for sidebar */
+.wizard-bottom-nav {
+  left: 264px !important;
+}
+
+/* When sidebar is collapsed */
+.responsive-layout .ant-layout-sider-collapsed ~ .responsive-main-layout .wizard-bottom-nav {
+  left: 80px !important;
+}
+
+/* For browsers that support :has() */
+.responsive-layout:has(.ant-layout-sider-collapsed) .wizard-bottom-nav {
+  left: 80px !important;
+}
+
+@media (max-width: 992px) {
+  .wizard-bottom-nav {
+    left: 80px !important;
   }
 }
 

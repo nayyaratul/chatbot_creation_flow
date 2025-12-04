@@ -1,5 +1,5 @@
-import { Form, Input, Select, Space, Button, Typography, Divider } from 'antd';
-import { ArrowRightOutlined } from '@ant-design/icons';
+import { forwardRef, useImperativeHandle } from 'react';
+import { Form, Input, Select, Typography } from 'antd';
 import { AgentFormData } from '../../types/agent';
 import AvatarUpload from '../shared/AvatarUpload';
 
@@ -12,8 +12,19 @@ interface Step1IdentityProps {
   onNext: () => void;
 }
 
-function Step1Identity({ formData, updateFormData, onNext }: Step1IdentityProps) {
-  const [form] = Form.useForm();
+export interface Step1IdentityRef {
+  submit: () => void;
+}
+
+const Step1Identity = forwardRef<Step1IdentityRef, Step1IdentityProps>(
+  ({ formData, updateFormData, onNext }, ref) => {
+    const [form] = Form.useForm();
+
+    useImperativeHandle(ref, () => ({
+      submit: () => {
+        form.submit();
+      },
+    }));
 
   const handleFinish = (values: any) => {
     updateFormData({
@@ -123,20 +134,12 @@ function Step1Identity({ formData, updateFormData, onNext }: Step1IdentityProps)
             </Select.Option>
           </Select>
         </Form.Item>
-
-        <Divider />
-
-        <Form.Item>
-          <Space>
-            <Button type="primary" htmlType="submit" icon={<ArrowRightOutlined />}>
-              Next: Behavior
-            </Button>
-          </Space>
-        </Form.Item>
       </Form>
     </div>
   );
-}
+});
+
+Step1Identity.displayName = 'Step1Identity';
 
 export default Step1Identity;
 

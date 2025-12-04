@@ -30,7 +30,7 @@ function AgentsList() {
       const data = await agentApi.getAll();
       const agentsArray = Array.isArray(data) ? data : [];
       setAgents(agentsArray);
-    } catch (error: any) {
+    } catch (error) {
       message.error('Failed to load agents');
       console.error('Error loading agents:', error);
       setAgents([]); // Set empty array on error to prevent stuck loading state
@@ -41,21 +41,14 @@ function AgentsList() {
   }, []);
 
   useEffect(() => {
-    // Load agents when component mounts or when on the /agents route
-    if (location.pathname === '/agents') {
+    // Load agents when component mounts, route changes, or tab changes
+    if (location.pathname === '/agents' && activeTab === 'ai-agent') {
       loadAgents();
-    } else {
+    } else if (location.pathname !== '/agents') {
       // Reset loading state if not on agents route
       setLoading(false);
     }
-  }, [location.pathname, loadAgents]);
-
-  useEffect(() => {
-    // Load agents when AI Agent tab is selected
-    if (activeTab === 'ai-agent' && location.pathname === '/agents') {
-      loadAgents();
-    }
-  }, [activeTab, location.pathname, loadAgents]);
+  }, [location.pathname, activeTab, loadAgents]);
 
   const handleCreateAgent = () => {
     navigate('/agents/new');
@@ -177,7 +170,7 @@ function AgentsList() {
                       boxShadow: '0px 2px 0px 0px rgba(5, 145, 255, 0.1)',
                     }}
                   >
-                    Create Chatbot
+                    Create Agent
                   </Button>
                 </div>
                 {!loading && agents.length > 0 && <StatsCards activeCount={activeCount} />}
