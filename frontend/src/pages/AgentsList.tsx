@@ -28,7 +28,8 @@ function AgentsList() {
     try {
       setLoading(true);
       const data = await agentApi.getAll();
-      setAgents(Array.isArray(data) ? data : []); // Ensure we always have an array
+      const agentsArray = Array.isArray(data) ? data : [];
+      setAgents(agentsArray);
     } catch (error: any) {
       message.error('Failed to load agents');
       console.error('Error loading agents:', error);

@@ -17,12 +17,14 @@ router.get('/', (req: Request, res: Response) => {
     const user = req.user!;
     let filteredAgents = agents;
     
+    // Admins and super_admins can see all agents
     if (user.role === 'viewer' || user.role === 'editor') {
       // Editors and viewers can only see agents they own or are shared with
       filteredAgents = agents.filter(agent => 
         agent.ownerId === user.id || agent.owners.includes(user.id)
       );
     }
+    // For admin and super_admin roles, filteredAgents already equals all agents
     
     res.json(filteredAgents);
   } catch (error) {

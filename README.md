@@ -151,6 +151,16 @@ The frontend will run on `http://localhost:3000`
 - Knowledge bases are stored as JSON files
 - LLM preview uses mock responses based on configuration
 - All data is stored in JSON files (backend/src/data/)
+- **Fully offline-capable** - Works completely offline on localhost after initial dependency installation
+
+## Offline Usage
+
+This application is designed to work **completely offline** on localhost. See [OFFLINE.md](./OFFLINE.md) for detailed offline usage instructions.
+
+**Quick offline setup:**
+1. Install dependencies once (requires internet): `npm install` in both `backend/` and `frontend/`
+2. Run offline: `npm run dev` in both directories
+3. Access at `http://localhost:3000` - no internet required!
 
 ## Future Enhancements
 

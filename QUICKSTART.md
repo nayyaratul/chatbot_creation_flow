@@ -4,6 +4,8 @@
 - Node.js 18+ installed
 - npm or yarn package manager
 
+> **💡 Offline Mode**: This application works completely offline after initial setup! See [OFFLINE.md](./OFFLINE.md) for details.
+
 ## Setup (5 minutes)
 
 ### 1. Backend Setup
@@ -57,6 +59,21 @@ Navigate to `http://localhost:3000/agents`
 - Ensure backend is running on port 3001
 - Check browser console for CORS errors
 - Verify proxy settings in `frontend/vite.config.ts`
+
+## Offline Usage
+
+This application is **fully offline-capable**! After installing dependencies once (requires internet), you can run it completely offline:
+
+- ✅ No external API calls
+- ✅ No CDN dependencies  
+- ✅ All data stored locally
+- ✅ Works without internet connection
+
+**Quick start offline:**
+- Use `./start-offline.sh` (Mac/Linux) or `start-offline.bat` (Windows)
+- Or manually: `npm run dev` in both `backend/` and `frontend/` directories
+
+See [OFFLINE.md](./OFFLINE.md) for complete offline usage guide.
 
 ## Next Steps
 
