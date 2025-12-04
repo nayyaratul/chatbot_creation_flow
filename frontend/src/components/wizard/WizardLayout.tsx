@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Steps, Button, Card, Layout, Space } from 'antd';
+import { Steps, Button, Card, Layout, Space, Modal } from 'antd';
 import { ArrowLeftOutlined, ArrowRightOutlined } from '@ant-design/icons';
 import { AgentFormData } from '../../types/agent';
 import Step1Identity, { Step1IdentityRef } from './Step1Identity';
@@ -49,9 +49,10 @@ const defaultFormData: AgentFormData = {
 function WizardLayout({ initialData, isEditMode, onSave, onCancel }: WizardLayoutProps) {
   const [currentStep, setCurrentStep] = useState(0);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const initialFormDataRef = useRef<AgentFormData | null>(null);
   const [formData, setFormData] = useState<AgentFormData>(() => {
     if (initialData) {
-      return {
+      const merged = {
         ...defaultFormData,
         ...initialData,
         settings: {
@@ -67,7 +68,10 @@ function WizardLayout({ initialData, isEditMode, onSave, onCancel }: WizardLayou
           ...initialData.conversationConfig,
         },
       };
+      initialFormDataRef.current = merged;
+      return merged;
     }
+    initialFormDataRef.current = defaultFormData;
     return defaultFormData;
   });
 
@@ -136,6 +140,82 @@ function WizardLayout({ initialData, isEditMode, onSave, onCancel }: WizardLayou
   const handleStepNext = () => {
     if (currentStep < steps.length - 1) {
       setCurrentStep(currentStep + 1);
+    }
+  };
+
+  const hasFormChanges = (): boolean => {
+    const initial = initialFormDataRef.current || defaultFormData;
+    
+    // Get current form values from active step if available (for unsaved changes)
+    let currentFormValues: any = null;
+    if (currentStep === 0 && step1FormRef.current) {
+      currentFormValues = step1FormRef.current.getCurrentValues();
+    } else if (currentStep === 1 && step2FormRef.current) {
+      currentFormValues = step2FormRef.current.getCurrentValues();
+    }
+    
+    // Check saved formData changes
+    if (formData.name !== initial.name) return true;
+    if (formData.description !== initial.description) return true;
+    if (formData.avatarUrl !== initial.avatarUrl) return true;
+    if (JSON.stringify(formData.owners) !== JSON.stringify(initial.owners)) return true;
+    if (formData.defaultLanguage !== initial.defaultLanguage) return true;
+    if (formData.settings.tone !== initial.settings.tone) return true;
+    if (formData.settings.firstMessage !== initial.settings.firstMessage) return true;
+    if (formData.settings.temperature !== initial.settings.temperature) return true;
+    if (formData.settings.tasks !== initial.settings.tasks) return true;
+    if (formData.settings.agentRole !== initial.settings.agentRole) return true;
+    if (formData.settings.fallbackMessage !== initial.settings.fallbackMessage) return true;
+    if (JSON.stringify(formData.settings.guardrails) !== JSON.stringify(initial.settings.guardrails)) return true;
+    if (formData.conversationConfig.maxLength !== initial.conversationConfig.maxLength) return true;
+    if (formData.conversationConfig.silenceTimeout !== initial.conversationConfig.silenceTimeout) return true;
+    if (formData.conversationConfig.maxDuration !== initial.conversationConfig.maxDuration) return true;
+    if (JSON.stringify(formData.knowledgeBaseFileIds) !== JSON.stringify(initial.knowledgeBaseFileIds)) return true;
+    
+    // Check unsaved form values (Step 1 - Identity)
+    if (currentFormValues && currentStep === 0) {
+      if (currentFormValues.name && currentFormValues.name !== initial.name) return true;
+      if (currentFormValues.description && currentFormValues.description !== initial.description) return true;
+      if (currentFormValues.avatarUrl !== undefined && currentFormValues.avatarUrl !== initial.avatarUrl) return true;
+      if (currentFormValues.owners && JSON.stringify(currentFormValues.owners) !== JSON.stringify(initial.owners)) return true;
+      if (currentFormValues.defaultLanguage && currentFormValues.defaultLanguage !== initial.defaultLanguage) return true;
+      if (currentFormValues.tasks && currentFormValues.tasks !== initial.settings.tasks) return true;
+    }
+    
+    // Check unsaved form values (Step 2 - Behavior)
+    if (currentFormValues && currentStep === 1) {
+      if (currentFormValues.tasks && currentFormValues.tasks !== initial.settings.tasks) return true;
+      if (currentFormValues.agentRole && currentFormValues.agentRole !== initial.settings.agentRole) return true;
+      if (currentFormValues.tone && currentFormValues.tone !== initial.settings.tone) return true;
+      if (currentFormValues.firstMessage && currentFormValues.firstMessage !== initial.settings.firstMessage) return true;
+      if (currentFormValues.temperature !== undefined && currentFormValues.temperature !== initial.settings.temperature) return true;
+      if (currentFormValues.fallbackMessage && currentFormValues.fallbackMessage !== initial.settings.fallbackMessage) return true;
+      if (currentFormValues.guardrails && JSON.stringify(currentFormValues.guardrails) !== JSON.stringify(initial.settings.guardrails)) return true;
+      if (currentFormValues.maxLength !== undefined && currentFormValues.maxLength !== initial.conversationConfig.maxLength) return true;
+      if (currentFormValues.silenceTimeout !== undefined && currentFormValues.silenceTimeout !== initial.conversationConfig.silenceTimeout) return true;
+      if (currentFormValues.maxDuration !== undefined) {
+        const currentDuration = currentFormValues.maxDuration?.format('HH:mm');
+        if (currentDuration !== initial.conversationConfig.maxDuration) return true;
+      }
+    }
+    
+    return false;
+  };
+
+  const handleCancel = () => {
+    if (hasFormChanges()) {
+      Modal.confirm({
+        title: 'Discard Changes?',
+        content: 'You have unsaved changes. Are you sure you want to go back? All progress will be lost.',
+        okText: 'Yes, Discard',
+        okType: 'danger',
+        cancelText: 'Cancel',
+        onOk: () => {
+          onCancel();
+        },
+      });
+    } else {
+      onCancel();
     }
   };
 
@@ -210,11 +290,10 @@ function WizardLayout({ initialData, isEditMode, onSave, onCancel }: WizardLayou
             <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
               <Button
                 icon={<ArrowLeftOutlined />}
-                onClick={onCancel}
+                onClick={handleCancel}
                 size="small"
-              >
-                Back to Agents
-              </Button>
+                type="text"
+              />
               <h1 style={{ margin: 0, fontSize: '20px', fontWeight: 600 }}>
                 {isEditMode ? 'Edit Agent' : 'Create Agent'}
               </h1>

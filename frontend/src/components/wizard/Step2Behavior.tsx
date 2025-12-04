@@ -1,5 +1,5 @@
 import { forwardRef, useImperativeHandle } from 'react';
-import { Form, Input, Radio, Typography, Divider, InputNumber, Switch, TimePicker } from 'antd';
+import { Form, Input, Radio, Typography, Divider, InputNumber, Switch, TimePicker, Row, Col } from 'antd';
 import dayjs from 'dayjs';
 import { AgentFormData } from '../../types/agent';
 import TemperatureSlider from '../shared/TemperatureSlider';
@@ -16,6 +16,7 @@ interface Step2BehaviorProps {
 
 export interface Step2BehaviorRef {
   submit: () => void;
+  getCurrentValues: () => any;
 }
 
 const Step2Behavior = forwardRef<Step2BehaviorRef, Step2BehaviorProps>(
@@ -25,6 +26,9 @@ const Step2Behavior = forwardRef<Step2BehaviorRef, Step2BehaviorProps>(
     useImperativeHandle(ref, () => ({
       submit: () => {
         form.submit();
+      },
+      getCurrentValues: () => {
+        return form.getFieldsValue();
       },
     }));
 
@@ -93,27 +97,32 @@ const Step2Behavior = forwardRef<Step2BehaviorRef, Step2BehaviorProps>(
             />
           </Form.Item>
 
-          <Form.Item
-            label="Agent Role"
-            name="agentRole"
-            tooltip="e.g., HR Assistant, Learning Guide"
-          >
-            <Input placeholder="Enter agent role" />
-          </Form.Item>
-
-          <Form.Item
-            label="Tone of Voice"
-            name="tone"
-            rules={[{ required: true, message: 'Please select a tone' }]}
-          >
-            <Radio.Group>
-              <Radio value="soft">Soft</Radio>
-              <Radio value="professional">Professional</Radio>
-            </Radio.Group>
-            <Text type="secondary" style={{ fontSize: '12px', display: 'block', marginTop: '4px' }}>
-              More tones coming in V2
-            </Text>
-          </Form.Item>
+          <Row gutter={16}>
+            <Col xs={24} sm={24} md={12}>
+              <Form.Item
+                label="Agent Role"
+                name="agentRole"
+                tooltip="e.g., HR Assistant, Learning Guide"
+              >
+                <Input placeholder="Enter agent role" />
+              </Form.Item>
+            </Col>
+            <Col xs={24} sm={24} md={12}>
+              <Form.Item
+                label="Tone of Voice"
+                name="tone"
+                rules={[{ required: true, message: 'Please select a tone' }]}
+              >
+                <Radio.Group>
+                  <Radio value="soft">Soft</Radio>
+                  <Radio value="professional">Professional</Radio>
+                </Radio.Group>
+                <Text type="secondary" style={{ fontSize: '12px', display: 'block', marginTop: '4px' }}>
+                  More tones coming in V2
+                </Text>
+              </Form.Item>
+            </Col>
+          </Row>
 
           <Form.Item
             label="First Message"
@@ -200,71 +209,82 @@ const Step2Behavior = forwardRef<Step2BehaviorRef, Step2BehaviorProps>(
             />
           </Form.Item>
 
-          <Form.Item
-            label="Silence Timeout"
-            name="silenceTimeout"
-            rules={[
-              { required: true, message: 'Silence timeout is required' },
-              { 
-                validator: (_, value) => {
-                  if (value === 0) return Promise.resolve();
-                  if (value >= 5) return Promise.resolve();
-                  return Promise.reject(new Error('Must be at least 5 seconds or 0 (no auto-end)'));
+          <Row gutter={16}>
+            <Col xs={24} sm={24} md={12}>
+              <Form.Item
+                label="Silence Timeout"
+                name="silenceTimeout"
+                rules={[
+                  { required: true, message: 'Silence timeout is required' },
+                  { 
+                    validator: (_, value) => {
+                      if (value === 0) return Promise.resolve();
+                      if (value >= 5) return Promise.resolve();
+                      return Promise.reject(new Error('Must be at least 5 seconds or 0 (no auto-end)'));
+                    }
+                  },
+                ]}
+                tooltip="Auto-end conversation after X seconds of inactivity (0 = no auto-end)"
+              >
+                <InputNumber
+                  min={0}
+                  placeholder="15"
+                  addonAfter="seconds"
+                  style={{ width: '100%' }}
+                />
+              </Form.Item>
+            </Col>
+            <Col xs={24} sm={24} md={12}>
+              <Form.Item
+                label="Max Response Length"
+                name="maxLength"
+                rules={[
+                  { required: true, message: 'Max response length is required' },
+                  { type: 'number', min: 50, message: 'Minimum 50 words' },
+                ]}
+                tooltip="Maximum number of words in a response"
+              >
+                <InputNumber
+                  min={50}
+                  placeholder="100"
+                  addonAfter="words"
+                  style={{ width: '100%' }}
+                />
+              </Form.Item>
+            </Col>
+          </Row>
+
+          <Row gutter={16}>
+            <Col xs={24} sm={24} md={12}>
+              <Form.Item
+                label="Max Conversation Duration"
+                name="hasMaxDuration"
+                valuePropName="checked"
+              >
+                <Switch />
+              </Form.Item>
+            </Col>
+            <Col xs={24} sm={24} md={12}>
+              <Form.Item
+                noStyle
+                shouldUpdate={(prevValues, currentValues) =>
+                  prevValues.hasMaxDuration !== currentValues.hasMaxDuration
                 }
-              },
-            ]}
-            tooltip="Auto-end conversation after X seconds of inactivity (0 = no auto-end)"
-          >
-            <InputNumber
-              min={0}
-              placeholder="15"
-              addonAfter="seconds"
-              style={{ width: '100%' }}
-            />
-          </Form.Item>
-
-          <Form.Item
-            label="Max Conversation Duration"
-            name="hasMaxDuration"
-            valuePropName="checked"
-          >
-            <Switch />
-          </Form.Item>
-
-          <Form.Item
-            noStyle
-            shouldUpdate={(prevValues, currentValues) =>
-              prevValues.hasMaxDuration !== currentValues.hasMaxDuration
-            }
-          >
-            {({ getFieldValue }) =>
-              getFieldValue('hasMaxDuration') ? (
-                <Form.Item
-                  name="maxDuration"
-                  rules={[{ required: true, message: 'Please select max duration' }]}
-                >
-                  <TimePicker format="HH:mm" style={{ width: '100%' }} />
-                </Form.Item>
-              ) : null
-            }
-          </Form.Item>
-
-          <Form.Item
-            label="Max Response Length"
-            name="maxLength"
-            rules={[
-              { required: true, message: 'Max response length is required' },
-              { type: 'number', min: 50, message: 'Minimum 50 words' },
-            ]}
-            tooltip="Maximum number of words in a response"
-          >
-            <InputNumber
-              min={50}
-              placeholder="100"
-              addonAfter="words"
-              style={{ width: '100%' }}
-            />
-          </Form.Item>
+              >
+                {({ getFieldValue }) =>
+                  getFieldValue('hasMaxDuration') ? (
+                    <Form.Item
+                      label="Duration"
+                      name="maxDuration"
+                      rules={[{ required: true, message: 'Please select max duration' }]}
+                    >
+                      <TimePicker format="HH:mm" style={{ width: '100%' }} />
+                    </Form.Item>
+                  ) : null
+                }
+              </Form.Item>
+            </Col>
+          </Row>
         </div>
       </Form>
     </div>
