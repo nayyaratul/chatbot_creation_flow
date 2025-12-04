@@ -5,13 +5,16 @@ function PageTitleBar() {
   return (
     <div
       style={{
-        height: '72px',
+        minHeight: '72px',
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
         padding: '0 24px',
         background: '#FFFFFF',
+        flexWrap: 'wrap',
+        gap: '12px',
       }}
+      className="responsive-title-bar"
     >
       <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
         <div

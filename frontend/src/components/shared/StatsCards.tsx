@@ -9,7 +9,7 @@ interface StatsCardsProps {
 
 function StatsCards({ activeCount = 4, messages24h = 20, resolutionRate = 75 }: StatsCardsProps) {
   return (
-    <div style={{ display: 'flex', gap: '20px', marginBottom: '24px' }}>
+    <div style={{ display: 'flex', gap: '20px', marginBottom: '24px', flexWrap: 'wrap' }} className="responsive-stats">
       <Card
         style={{
           flex: 1,

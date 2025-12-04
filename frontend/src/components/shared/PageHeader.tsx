@@ -8,11 +8,14 @@ function PageHeader() {
         background: '#FFFFFF',
         borderBottom: '1px solid rgba(0, 0, 0, 0.06)',
         padding: '8px 24px',
-        height: '60px',
+        minHeight: '60px',
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
+        flexWrap: 'wrap',
+        gap: '12px',
       }}
+      className="responsive-page-header"
     >
       <Breadcrumb
         items={[

@@ -164,8 +164,9 @@ function AgentTable({ agents, loading, onPreview, onEdit, onDelete }: AgentTable
         background: '#FFFFFF',
         borderRadius: '8px',
         border: '1px solid rgba(0, 0, 0, 0.06)',
-        overflow: 'hidden',
+        overflow: 'auto',
       }}
+      className="responsive-table-container"
     >
       <Table
         columns={columns}
@@ -178,6 +179,8 @@ function AgentTable({ agents, loading, onPreview, onEdit, onDelete }: AgentTable
           showSizeChanger: true,
           showTotal: (total) => `Total ${total} agents`,
           style: { padding: '16px 24px' },
+          responsive: true,
+          showLessItems: true,
         }}
         rowSelection={{
           type: 'checkbox',

@@ -82,9 +82,9 @@ function AgentsList() {
   const activeCount = agents.filter((a) => a.status === 'active').length;
 
   return (
-    <Layout style={{ minHeight: '100vh', background: '#F5F5F5' }}>
+    <Layout style={{ minHeight: '100vh', background: '#F5F5F5' }} className="responsive-layout">
       <Sidebar />
-      <Layout style={{ marginLeft: 0 }}>
+      <Layout style={{ marginLeft: 0 }} className="responsive-main-layout">
         <PageHeader />
         <PageTitleBar />
         <Content
@@ -94,8 +94,9 @@ function AgentsList() {
             background: '#F5F5F5',
             minHeight: 'calc(100vh - 132px)',
           }}
+          className="responsive-content"
         >
-          <div style={{ maxWidth: '1128px', margin: '0 auto' }}>
+          <div style={{ maxWidth: '1128px', margin: '0 auto', width: '100%' }}>
             <Tabs
               activeKey={activeTab}
               onChange={setActiveTab}
@@ -118,6 +119,7 @@ function AgentsList() {
                 },
               ]}
               style={{ marginBottom: '0', marginTop: '0' }}
+              className="responsive-tabs"
             />
             {activeTab === 'ai-agent' && (
               <>
@@ -126,9 +128,14 @@ function AgentsList() {
                     display: 'flex',
                     justifyContent: 'space-between',
                     alignItems: 'flex-start',
-                    marginBottom: '24px',
-                    marginTop: '16px',
+                    marginBottom: '0',
+                    marginTop: '0',
+                    flexWrap: 'wrap',
+                    gap: '16px',
+                    paddingTop: '0',
+                    paddingBottom: '16px',
                   }}
+                  className="responsive-header"
                 >
                   <div>
                     <h2

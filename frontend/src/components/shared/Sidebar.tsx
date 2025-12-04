@@ -1,12 +1,14 @@
 import { Layout, Menu } from 'antd';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { MailOutlined } from '@ant-design/icons';
+import { useState } from 'react';
 
 const { Sider } = Layout;
 
 function Sidebar() {
   const navigate = useNavigate();
   const location = useLocation();
+  const [collapsed, setCollapsed] = useState(false);
 
   const menuItems = [
     {
@@ -62,7 +64,12 @@ function Sidebar() {
 
   return (
     <Sider
+      collapsible
+      collapsed={collapsed}
+      onCollapse={setCollapsed}
       width={264}
+      collapsedWidth={80}
+      breakpoint="lg"
       style={{
         background: '#1F1F1F',
         minHeight: '100vh',

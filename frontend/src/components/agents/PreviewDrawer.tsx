@@ -74,6 +74,7 @@ function PreviewDrawer({ agent, visible, onClose }: PreviewDrawerProps) {
       width={600}
       onClose={onClose}
       open={visible}
+      className="responsive-drawer"
     >
       <Space direction="vertical" size="large" style={{ width: '100%' }}>
         {/* Agent Identity */}
